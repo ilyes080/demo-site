@@ -1,0 +1,1549 @@
+import React, { useState } from 'react';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import {
+  BuildingStorefrontIcon,
+  ChartBarIcon,
+  DocumentCheckIcon,
+  Cog6ToothIcon,
+  ClipboardDocumentCheckIcon,
+  DocumentArrowDownIcon,
+  CurrencyEuroIcon,
+  ArrowTrendingUpIcon,
+  ShieldCheckIcon,
+  ClockIcon,
+  ExclamationTriangleIcon
+} from '@heroicons/react/24/outline';
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
+
+const ChainManagement = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [modalContent, setModalContent] = useState({ title: '', content: '', type: '' });
+
+  const { data: chainData, isLoading } = useQuery(
+    'chainData',
+    () => axios.get('/api/chains/dashboard').then(res => res.data)
+  );
+
+  const showModal = (title, content, type = 'info') => {
+    setModalContent({ title, content, type });
+    setShowDetailModal(true);
+  };
+
+
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  const tabs = [
+    { id: 'overview', name: 'Vue d\'ensemble', icon: ChartBarIcon },
+    { id: 'sites', name: 'Gestion Sites', icon: BuildingStorefrontIcon },
+    { id: 'standards', name: 'Standards', icon: DocumentCheckIcon },
+    { id: 'audits', name: 'Audits', icon: Cog6ToothIcon },
+  ];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Gestion Chaîne</h1>
+        <p className="text-gray-600">
+          Pilotage multi-sites et standardisation
+        </p>
+      </div>
+
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                activeTab === tab.id
+                  ? 'border-primary-500 text-primary-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <tab.icon className="h-5 w-5" />
+              <span>{tab.name}</span>
+            </button>
+          ))}
+        </nav>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-6">
+        {activeTab === 'overview' && <ChainOverview data={chainData} showModal={showModal} />}
+        {activeTab === 'sites' && <SitesManagement data={chainData?.sites} showModal={showModal} />}
+        {activeTab === 'standards' && <StandardsManagement showModal={showModal} />}
+        {activeTab === 'audits' && <AuditsManagement showModal={showModal} />}
+      </div>
+
+      {/* Detail Modal */}
+      {showDetailModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setShowDetailModal(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div className="flex items-start">
+                  <div className={`mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full ${
+                    modalContent.type === 'success' ? 'bg-green-100' :
+                    modalContent.type === 'warning' ? 'bg-yellow-100' :
+                    modalContent.type === 'error' ? 'bg-red-100' : 'bg-blue-100'
+                  } sm:mx-0 sm:h-10 sm:w-10`}>
+                    {modalContent.type === 'success' && (
+                      <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                    {modalContent.type === 'warning' && (
+                      <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                      </svg>
+                    )}
+                    {(modalContent.type === 'info' || !modalContent.type) && (
+                      <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left flex-1">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+                      {modalContent.title}
+                    </h3>
+                    <div className="mt-2">
+                      <div className="text-sm text-gray-500">
+                        {typeof modalContent.content === 'string' ? (
+                          <div className="whitespace-pre-line">{modalContent.content}</div>
+                        ) : (
+                          modalContent.content
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={() => setShowDetailModal(false)}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ChainOverview = ({ data, showModal }) => {
+  const sites = data?.sites || [];
+  const performance = data?.performance || {};
+
+  return (
+    <div className="space-y-6">
+
+
+      {/* KPIs Graphiques Interactifs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        {/* Sites Total - Graphique en barres */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-6 shadow-xl border border-blue-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105" 
+             onClick={() => showModal('Détail des Sites', 
+               `📊 ANALYSE DÉTAILLÉE DES SITES\n\n` +
+               `🏪 Nombre total de sites: ${sites.length}\n\n` +
+               `📍 Performance par région:\n` +
+               `   🟢 Paris: Excellent (92%)\n` +
+               `   🔵 Lyon: Très bon (88%)\n` +
+               `   🟡 Toulouse: Bon (85%)\n` +
+               `   🟠 Nice: Bon (82%)\n` +
+               `   🔴 Marseille: À améliorer (78%)\n\n` +
+               `📈 Évolution (3 derniers mois):\n` +
+               `   • Octobre: 80%\n` +
+               `   • Novembre: 83%\n` +
+               `   • Décembre: 85% (+2%)\n\n` +
+               `🎯 Actions prioritaires:\n` +
+               `   🔴 Formation équipe Marseille (Urgent)\n` +
+               `   🟡 Optimisation Nice/Toulouse\n` +
+               `   🟢 Maintenir standards Paris/Lyon\n\n` +
+               `📊 Objectifs 2025:\n` +
+               `   • Atteindre 90% sur tous les sites\n` +
+               `   • Ouvrir 2 nouveaux sites\n` +
+               `   • Certification qualité ISO`, 'info')}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
+              <BuildingStorefrontIcon className="h-8 w-8 text-white" />
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-blue-600 font-medium">+2 ce mois</div>
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          
+          <h3 className="text-lg font-semibold text-blue-900 mb-2">Sites Total</h3>
+          <div className="flex items-end space-x-1 mb-3 h-12">
+            {[92, 88, 85, 82, 78].map((height, index) => (
+              <div key={index} className="flex-1 bg-gradient-to-t from-blue-400 to-blue-600 rounded-t-lg opacity-80 hover:opacity-100 transition-opacity" 
+                   style={{ height: `${height}%` }}></div>
+            ))}
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-4xl font-bold text-blue-700">{sites.length}</span>
+            <div className="text-sm text-blue-600">
+              <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800">
+                <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
+                +12%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* CA Total - Graphique en aires */}
+        <div className="bg-gradient-to-br from-green-50 to-emerald-100 rounded-2xl p-6 shadow-xl border border-green-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+             onClick={() => showModal('Analyse Chiffre d\'Affaires', 
+               `💰 ANALYSE FINANCIÈRE DÉTAILLÉE\n\n` +
+               `📊 CA Total Mensuel: ${(performance.totalRevenue || 125000).toLocaleString()}€\n` +
+               `📈 Évolution: +12% vs mois précédent\n` +
+               `🎯 Objectif mensuel: 130,000€ (96% atteint)\n\n` +
+               `💵 Répartition par site:\n` +
+               `   🟢 Paris Centre: 75,000€ (60%)\n` +
+               `   🔵 Lyon Part-Dieu: 54,000€ (43%)\n` +
+               `   🟡 Toulouse Centre: 45,000€ (36%)\n` +
+               `   🟠 Marseille V.Port: 36,000€ (29%)\n` +
+               `   🔴 Nice Promenade: 33,000€ (26%)\n\n` +
+               `📈 Prévisions trimestrielles:\n` +
+               `   • Janvier: +8% (135,000€)\n` +
+               `   • Février: +5% (142,000€)\n` +
+               `   • Mars: +3% (146,000€)\n\n` +
+               `🎯 Actions recommandées:\n` +
+               `   • Campagne marketing Marseille\n` +
+               `   • Optimisation menu Nice\n` +
+               `   • Formation vente Toulouse\n` +
+               `   • Maintenir excellence Paris/Lyon`, 'success')}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-green-500 rounded-xl shadow-lg">
+              <CurrencyEuroIcon className="h-8 w-8 text-white" />
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-green-600 font-medium">Objectif: 96%</div>
+              <div className="w-16 bg-green-200 rounded-full h-2">
+                <div className="w-full h-2 bg-gradient-to-r from-green-400 to-green-600 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+          
+          <h3 className="text-lg font-semibold text-green-900 mb-2">CA Total</h3>
+          <div className="relative h-12 mb-3">
+            <svg className="w-full h-full" viewBox="0 0 100 40">
+              <defs>
+                <linearGradient id="revenueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.8"/>
+                  <stop offset="100%" stopColor="#10b981" stopOpacity="0.1"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,35 Q25,25 50,20 T100,15 L100,40 L0,40 Z" fill="url(#revenueGradient)" />
+              <path d="M0,35 Q25,25 50,20 T100,15" stroke="#10b981" strokeWidth="2" fill="none" />
+              <circle cx="100" cy="15" r="3" fill="#059669" />
+            </svg>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-4xl font-bold text-green-700">{(performance.totalRevenue || 0).toLocaleString()}€</span>
+            <div className="text-sm text-green-600">
+              <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-100 text-green-800">
+                <ArrowTrendingUpIcon className="h-3 w-3 mr-1" />
+                +12%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Score Moyen - Graphique circulaire */}
+        <div className="bg-gradient-to-br from-orange-50 to-amber-100 rounded-2xl p-6 shadow-xl border border-orange-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+             onClick={() => showModal('Score de Performance', 
+               `⭐ ÉVALUATION PERFORMANCE GLOBALE\n\n` +
+               `📊 Score Moyen Chaîne: ${performance.avgScore || 85}%\n` +
+               `🎯 Objectif: 90% (Écart: -5%)\n\n` +
+               `📋 Critères d'évaluation:\n` +
+               `   🟢 Propreté/Hygiène: 95%\n` +
+               `   🟢 Qualité produits: 92%\n` +
+               `   🟡 Service client: 88%\n` +
+               `   🟠 Présentation: 85%\n` +
+               `   🔴 Temps d'attente: 78%\n\n` +
+               `📈 Évolution (3 derniers mois):\n` +
+               `   • Octobre: 82%\n` +
+               `   • Novembre: 84%\n` +
+               `   • Décembre: 85% (+1%)\n\n` +
+               `🎯 Plan d'amélioration:\n` +
+               `   • Formation service (Temps d'attente)\n` +
+               `   • Standards présentation\n` +
+               `   • Audit qualité mensuel\n` +
+               `   • Système de récompenses équipes\n\n` +
+               `📊 Objectifs 2025:\n` +
+               `   • Atteindre 90% global\n` +
+               `   • 95% sur temps d'attente\n` +
+               `   • Certification service client`, 'warning')}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-orange-500 rounded-xl shadow-lg">
+              <ChartBarIcon className="h-8 w-8 text-white" />
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-orange-600 font-medium">Objectif: 90%</div>
+              <div className="flex space-x-1">
+                {[1,2,3,4].map((star, index) => (
+                  <div key={index} className={`w-2 h-2 rounded-full ${index < 3 ? 'bg-orange-400' : 'bg-orange-200'}`}></div>
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <h3 className="text-lg font-semibold text-orange-900 mb-2">Score Moyen</h3>
+          <div className="flex items-center justify-center mb-3">
+            <div className="relative w-20 h-20">
+              <svg className="w-20 h-20 transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" stroke="#fed7aa" strokeWidth="8" fill="transparent" />
+                <circle cx="50" cy="50" r="40" stroke="#f97316" strokeWidth="8" fill="transparent"
+                        strokeDasharray={`${2 * Math.PI * 40}`}
+                        strokeDashoffset={`${2 * Math.PI * 40 * (1 - (performance.avgScore || 0) / 100)}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-1000 ease-out" />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-lg font-bold text-orange-700">{performance.avgScore || 0}%</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-center">
+            <span className="inline-flex items-center px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-sm">
+              <ClockIcon className="h-3 w-3 mr-1" />
+              +1% ce mois
+            </span>
+          </div>
+        </div>
+
+        {/* Conformité - Graphique en jauge */}
+        <div className="bg-gradient-to-br from-purple-50 to-violet-100 rounded-2xl p-6 shadow-xl border border-purple-200 hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+             onClick={() => showModal('Conformité Standards', 
+               `✅ AUDIT DE CONFORMITÉ\n\n` +
+               `📊 Taux de Conformité: ${performance.compliance || 95}%\n` +
+               `🎯 Objectif: 98% (Écart: -3%)\n` +
+               `❌ Non-conformités actives: 3\n\n` +
+               `📋 Derniers audits (Décembre):\n` +
+               `   ✅ Paris Centre: 98% (Conforme)\n` +
+               `   ✅ Lyon Part-Dieu: 96% (Conforme)\n` +
+               `   ⚠️ Toulouse Centre: 94% (Attention)\n` +
+               `   ⚠️ Nice Promenade: 92% (Attention)\n` +
+               `   ❌ Marseille V.Port: 88% (Non-conforme)\n\n` +
+               `❌ Non-conformités identifiées:\n` +
+               `   🔴 Procédure fermeture (2 sites) - Priorité Haute\n` +
+               `   🟡 Stock rotation (1 site) - Priorité Moyenne\n` +
+               `   🟠 Formation équipe (1 site) - Priorité Moyenne\n\n` +
+               `🔧 Actions correctives planifiées:\n` +
+               `   • Audit surprise Marseille (15 Jan)\n` +
+               `   • Formation procédures (20 Jan)\n` +
+               `   • Mise à jour check-lists (25 Jan)\n` +
+               `   • Suivi hebdomadaire (Continu)\n\n` +
+               `📈 Objectifs 2025:\n` +
+               `   • Atteindre 98% de conformité\n` +
+               `   • Zéro non-conformité critique\n` +
+               `   • Certification ISO 22000`, 'info')}
+                     </div>
+                     <div className="bg-white p-3 rounded-lg shadow-sm">
+                       <div className="text-2xl font-bold text-red-600">3</div>
+                       <div className="text-sm text-gray-600">Non-conformités</div>
+                     </div>
+                   </div>
+                   
+                   <div className="space-y-3">
+                     {[
+                       { site: 'Paris Centre', score: 98, status: '✅', color: 'bg-green-500' },
+                       { site: 'Lyon Part-Dieu', score: 96, status: '✅', color: 'bg-green-400' },
+                       { site: 'Toulouse Centre', score: 94, status: '⚠️', color: 'bg-yellow-500' },
+                       { site: 'Nice Promenade', score: 92, status: '⚠️', color: 'bg-orange-500' },
+                       { site: 'Marseille V.Port', score: 88, status: '❌', color: 'bg-red-500' }
+                     ].map((site, index) => (
+                       <div key={index} className="flex items-center space-x-3">
+                         <div className="w-2 text-lg">{site.status}</div>
+                         <div className="w-28 text-sm">{site.site}</div>
+                         <div className="flex-1 bg-gray-200 rounded-full h-3">
+                           <div className={`h-3 rounded-full ${site.color}`} style={{ width: `${site.score}%` }}></div>
+                         </div>
+                         <div className="w-12 text-right text-sm font-semibold">{site.score}%</div>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+                 
+                 <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-lg">
+                   <h4 className="font-semibold text-red-900 mb-3">❌ Points d'Amélioration</h4>
+                   <div className="space-y-2">
+                     {[
+                       { probleme: 'Procédure fermeture', sites: 2, priorite: 'Haute' },
+                       { probleme: 'Rotation des stocks', sites: 1, priorite: 'Moyenne' },
+                       { probleme: 'Formation équipe', sites: 1, priorite: 'Haute' }
+                     ].map((item, index) => (
+                       <div key={index} className="flex items-center justify-between p-2 bg-white rounded-lg">
+                         <div className="flex items-center space-x-3">
+                           <div className={`w-2 h-2 rounded-full ${item.priorite === 'Haute' ? 'bg-red-500' : 'bg-yellow-500'}`}></div>
+                           <span className="text-sm font-medium">{item.probleme}</span>
+                         </div>
+                         <div className="text-xs text-gray-600">{item.sites} site(s)</div>
+                       </div>
+                     ))}
+                   </div>
+                 </div>
+                 
+                 <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-4 rounded-lg">
+                   <h4 className="font-semibold text-green-900 mb-3">🔧 Plan d'Action</h4>
+                   <div className="space-y-2">
+                     <div className="flex items-center space-x-2">
+                       <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                       <span className="text-sm">Audit surprise Marseille (15 Jan)</span>
+                     </div>
+                     <div className="flex items-center space-x-2">
+                       <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                       <span className="text-sm">Formation procédures (20 Jan)</span>
+                     </div>
+                     <div className="flex items-center space-x-2">
+                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                       <span className="text-sm">Mise à jour check-lists</span>
+                     </div>
+                   </div>
+                 </div>
+               `📈 Objectifs 2025:\n` +
+               `   • Atteindre 98% de conformité\n` +
+               `   • Zéro non-conformité critique\n` +
+               `   • Certification ISO 22000`, 'info')}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="p-3 bg-purple-500 rounded-xl shadow-lg">
+              <ShieldCheckIcon className="h-8 w-8 text-white" />
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-purple-600 font-medium">3 actions</div>
+              <div className="flex space-x-1">
+                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+              </div>
+            </div>
+          </div>
+          
+          <h3 className="text-lg font-semibold text-purple-900 mb-2">Conformité</h3>
+          <div className="relative mb-3">
+            <div className="w-full bg-purple-200 rounded-full h-4">
+              <div className="bg-gradient-to-r from-purple-400 to-purple-600 h-4 rounded-full transition-all duration-1000 ease-out relative overflow-hidden"
+                   style={{ width: `${performance.compliance || 95}%` }}>
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse"></div>
+              </div>
+            </div>
+            <div className="flex justify-between text-xs text-purple-600 mt-1">
+              <span>0%</span>
+              <span>50%</span>
+              <span>100%</span>
+            </div>
+          </div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-4xl font-bold text-purple-700">{performance.compliance || 95}%</span>
+            <div className="text-sm text-purple-600">
+              <span className="inline-flex items-center px-2 py-1 rounded-full bg-purple-100 text-purple-800">
+                <ExclamationTriangleIcon className="h-3 w-3 mr-1" />
+                -3% obj.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sites Performance - Tableau Interactif */}
+      <div className="card">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-lg font-medium text-gray-900">Performance par site</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Site
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  CA Jour
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Score
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Statut
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {sites.map((site) => (
+                <tr key={site.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-medium text-gray-900">{site.name}</div>
+                    <div className="text-sm text-gray-500">{site.location}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {site.dailyRevenue || 0}€
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="text-sm font-medium text-gray-900">{site.score || 0}%</div>
+                      <div className={`ml-2 w-16 bg-gray-200 rounded-full h-2`}>
+                        <div 
+                          className={`h-2 rounded-full ${
+                            (site.score || 0) >= 80 ? 'bg-green-500' : 
+                            (site.score || 0) >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                          }`}
+                          style={{ width: `${site.score || 0}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      site.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                    }`}>
+                      {site.status === 'active' ? 'Actif' : 'Inactif'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button 
+                      className="text-blue-600 hover:text-blue-900 mr-3"
+                      onClick={() => showModal(`Gestion ${site.name}`, 
+                        `🏪 PANNEAU DE GESTION - ${site.name}\n\n` +
+                        `📊 Informations générales:\n` +
+                        `   • Manager: ${site.manager}\n` +
+                        `   • Adresse: ${site.location}\n` +
+                        `   • Statut: ${site.status === 'active' ? 'Actif' : 'Inactif'}\n` +
+                        `   • Score actuel: ${site.score}%\n\n` +
+                        `💰 Performance financière:\n` +
+                        `   • CA aujourd'hui: ${site.dailyRevenue}€\n` +
+                        `   • CA mensuel estimé: ${(site.dailyRevenue * 30).toLocaleString()}€\n` +
+                        `   • Objectif mensuel: ${Math.round(site.dailyRevenue * 35).toLocaleString()}€\n\n` +
+                        `👥 Équipe (${Math.floor(Math.random() * 8) + 12} employés):\n` +
+                        `   • Manager: ${site.manager}\n` +
+                        `   • Chefs: ${Math.floor(Math.random() * 3) + 2}\n` +
+                        `   • Serveurs: ${Math.floor(Math.random() * 4) + 4}\n` +
+                        `   • Personnel cuisine: ${Math.floor(Math.random() * 3) + 3}\n\n` +
+                        `🎯 Actions disponibles:\n` +
+                        `   • Modifier les paramètres du site\n` +
+                        `   • Planifier un audit qualité\n` +
+                        `   • Gérer les horaires équipe\n` +
+                        `   • Voir rapports détaillés\n` +
+                        `   • Configurer les standards`, 'info')}
+                    >
+                      Gérer
+                    </button>
+                    <button 
+                      className="text-green-600 hover:text-green-900 mr-3"
+                      onClick={() => showModal(`Rapport ${site.name}`, 
+                        `📊 RAPPORT DÉTAILLÉ - ${site.name}\n\n` +
+                        `💰 Performance financière:\n` +
+                        `   • CA aujourd'hui: ${site.dailyRevenue}€\n` +
+                        `   • CA mensuel: ${(site.dailyRevenue * 30).toLocaleString()}€\n` +
+                        `   • Évolution: +${Math.floor(Math.random() * 20) + 5}%\n` +
+                        `   • Objectifs atteints: ${Math.floor(Math.random() * 30) + 70}%\n\n` +
+                        `📈 Tendances (7 derniers jours):\n` +
+                        `   • Lundi: ${Math.round(site.dailyRevenue * 0.8)}€\n` +
+                        `   • Mardi: ${Math.round(site.dailyRevenue * 0.9)}€\n` +
+                        `   • Mercredi: ${Math.round(site.dailyRevenue * 1.1)}€\n` +
+                        `   • Jeudi: ${Math.round(site.dailyRevenue * 1.2)}€\n` +
+                        `   • Vendredi: ${Math.round(site.dailyRevenue * 1.4)}€\n` +
+                        `   • Samedi: ${Math.round(site.dailyRevenue * 1.6)}€\n` +
+                        `   • Dimanche: ${Math.round(site.dailyRevenue * 1.3)}€\n\n` +
+                        `⭐ Indicateurs qualité:\n` +
+                        `   • Score global: ${site.score}%\n` +
+                        `   • Satisfaction client: ${Math.floor(Math.random() * 10) + 85}%\n` +
+                        `   • Temps d'attente moyen: ${Math.floor(Math.random() * 5) + 8}min\n\n` +
+                        `📅 Prochaines actions:\n` +
+                        `   • Visite manager: ${new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n` +
+                        `   • Formation équipe: Planifiée\n` +
+                        `   • Audit qualité: En attente`, 'success')}
+                    >
+                      Rapport
+                    </button>
+                    <button 
+                      className="text-purple-600 hover:text-purple-900"
+                      onClick={() => showModal(`Audit ${site.name}`, 
+                        `🔍 AUDIT QUALITÉ - ${site.name}\n\n` +
+                        `📊 Dernier audit: ${new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n` +
+                        `⭐ Score obtenu: ${site.score}%\n\n` +
+                        `✅ Points forts:\n` +
+                        `   • Propreté cuisine: Excellent\n` +
+                        `   • Qualité produits: Très bon\n` +
+                        `   • Accueil client: Bon\n\n` +
+                        `⚠️ Points d'amélioration:\n` +
+                        `   • Temps de service: ${site.score < 85 ? 'À améliorer' : 'Correct'}\n` +
+                        `   • Présentation plats: ${site.score < 80 ? 'Insuffisant' : 'Correct'}\n` +
+                        `   • Procédures fermeture: ${site.score < 90 ? 'À revoir' : 'Conforme'}\n\n` +
+                        `🎯 Actions correctives:\n` +
+                        `   ${site.score < 85 ? '• Formation service rapide\n   • Révision procédures\n   • Suivi hebdomadaire' : '• Maintenir les standards\n   • Audit de suivi dans 3 mois'}\n\n` +
+                        `📅 Prochain audit programmé:\n` +
+                        `   • Date: ${new Date(Date.now() + Math.random() * 60 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n` +
+                        `   • Type: ${site.score < 85 ? 'Audit de suivi' : 'Audit standard'}\n` +
+                        `   • Auditeur: ${['Marie Dubois', 'Pierre Leroy', 'Sophie Martin'][Math.floor(Math.random() * 3)]}`, 'info')}
+                    >
+                      Audit
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    </div>
+  );
+};
+
+const SitesManagement = ({ sites = [], showModal }) => {
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newSite, setNewSite] = useState({
+    name: '',
+    location: '',
+    manager: '',
+    phone: '',
+    email: ''
+  });
+
+  const handleAddSite = () => {
+    if (newSite.name && newSite.location) {
+      // Simulate adding the site
+      console.log('Nouveau site ajouté:', newSite);
+      showModal('Site Ajouté avec Succès', 
+        `✅ NOUVEAU SITE CRÉÉ\n\n` +
+        `🏪 Nom: ${newSite.name}\n` +
+        `📍 Adresse: ${newSite.location}\n` +
+        `👤 Manager: ${newSite.manager || 'À assigner'}\n` +
+        `📞 Téléphone: ${newSite.phone || 'À renseigner'}\n` +
+        `📧 Email: ${newSite.email || 'À renseigner'}\n\n` +
+        `🎯 Prochaines étapes:\n` +
+        `   • Configuration des standards\n` +
+        `   • Formation de l'équipe\n` +
+        `   • Installation du système\n` +
+        `   • Audit d'ouverture\n\n` +
+        `📅 Ouverture prévue: ${new Date(Date.now() + 21 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n\n` +
+        `Le site apparaîtra dans la liste après validation.`, 'success');
+      
+      setShowAddModal(false);
+      setNewSite({ name: '', location: '', manager: '', phone: '', email: '' });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium text-gray-900">Gestion des sites</h3>
+        <button 
+          className="btn btn-primary"
+          onClick={() => setShowAddModal(true)}
+        >
+          Ajouter un site
+        </button>
+      </div>
+
+      {/* Modal d'ajout de site */}
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setShowAddModal(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Ajouter un nouveau site</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Nom du site *</label>
+                    <input
+                      type="text"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newSite.name}
+                      onChange={(e) => setNewSite({...newSite, name: e.target.value})}
+                      placeholder="Ex: Restaurant Paris Centre"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Adresse *</label>
+                    <input
+                      type="text"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newSite.location}
+                      onChange={(e) => setNewSite({...newSite, location: e.target.value})}
+                      placeholder="Ex: 123 Rue de la Paix, 75001 Paris"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Manager</label>
+                    <input
+                      type="text"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newSite.manager}
+                      onChange={(e) => setNewSite({...newSite, manager: e.target.value})}
+                      placeholder="Nom du responsable"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Téléphone</label>
+                    <input
+                      type="tel"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newSite.phone}
+                      onChange={(e) => setNewSite({...newSite, phone: e.target.value})}
+                      placeholder="01 23 45 67 89"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <input
+                      type="email"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newSite.email}
+                      onChange={(e) => setNewSite({...newSite, email: e.target.value})}
+                      placeholder="site@restaurant.com"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={handleAddSite}
+                  disabled={!newSite.name || !newSite.location}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Ajouter
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sites.map((site) => (
+          <div key={site.id} className="card">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-lg font-medium text-gray-900">{site.name}</h4>
+              <span className={`px-2 py-1 text-xs rounded-full ${
+                site.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}>
+                {site.status === 'active' ? 'Actif' : 'Inactif'}
+              </span>
+            </div>
+            
+            <div className="space-y-2 text-sm text-gray-600">
+              <p><strong>Adresse:</strong> {site.location}</p>
+              <p><strong>Manager:</strong> {site.manager || 'Non assigné'}</p>
+              <p><strong>CA aujourd'hui:</strong> {site.dailyRevenue || 0}€</p>
+              <p><strong>Score:</strong> {site.score || 0}%</p>
+            </div>
+            
+            <div className="mt-4 flex space-x-2">
+              <button 
+                className="btn btn-secondary text-xs"
+                onClick={() => showModal(`Modifier ${site.name}`, 
+                  `✏️ MODIFICATION DU SITE\n\n` +
+                  `📊 Informations actuelles:\n` +
+                  `   • Nom: ${site.name}\n` +
+                  `   • Adresse: ${site.location}\n` +
+                  `   • Manager: ${site.manager || 'Non assigné'}\n` +
+                  `   • Statut: ${site.status === 'active' ? 'Actif' : 'Inactif'}\n\n` +
+                  `🔧 Modifications possibles:\n` +
+                  `   • Changer le manager\n` +
+                  `   • Mettre à jour les coordonnées\n` +
+                  `   • Modifier les horaires\n` +
+                  `   • Ajuster la capacité\n` +
+                  `   • Configurer les standards\n\n` +
+                  `⚠️ Attention:\n` +
+                  `Certaines modifications peuvent nécessiter une validation du siège et impacter les opérations en cours.\n\n` +
+                  `Pour effectuer les modifications, contactez l'administrateur système.`, 'warning')}
+              >
+                Modifier
+              </button>
+              <button 
+                className="btn btn-primary text-xs"
+                onClick={() => showModal(`Détails ${site.name}`, 
+                  `📊 FICHE DÉTAILLÉE DU SITE\n\n` +
+                  `🏪 Informations générales:\n` +
+                  `   • Nom complet: ${site.name}\n` +
+                  `   • Adresse: ${site.location}\n` +
+                  `   • Manager: ${site.manager || 'Non assigné'}\n` +
+                  `   • Statut: ${site.status === 'active' ? '🟢 Actif' : '🔴 Inactif'}\n\n` +
+                  `💰 Performance aujourd'hui:\n` +
+                  `   • Chiffre d'affaires: ${site.dailyRevenue || 0}€\n` +
+                  `   • Nombre de commandes: ${Math.floor(Math.random() * 50) + 80}\n` +
+                  `   • Ticket moyen: ${Math.round((site.dailyRevenue || 0) / (Math.floor(Math.random() * 50) + 80))}€\n\n` +
+                  `⭐ Qualité et performance:\n` +
+                  `   • Score global: ${site.score || 0}%\n` +
+                  `   • Satisfaction client: ${Math.floor(Math.random() * 10) + 85}%\n` +
+                  `   • Temps d'attente moyen: ${Math.floor(Math.random() * 5) + 8}min\n` +
+                  `   • Taux de conformité: ${Math.floor(Math.random() * 15) + 85}%\n\n` +
+                  `👥 Équipe (${Math.floor(Math.random() * 8) + 12} employés):\n` +
+                  `   • Manager: 1\n` +
+                  `   • Chefs: ${Math.floor(Math.random() * 3) + 2}\n` +
+                  `   • Serveurs: ${Math.floor(Math.random() * 4) + 4}\n` +
+                  `   • Personnel cuisine: ${Math.floor(Math.random() * 3) + 3}\n\n` +
+                  `📅 Dernière visite: ${new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n` +
+                  `🔍 Prochain audit: ${new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}`, 'info')}
+              >
+                Détails
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const StandardsManagement = ({ showModal }) => {
+  const [showStandardModal, setShowStandardModal] = useState(false);
+  const [newStandard, setNewStandard] = useState({
+    name: '',
+    type: 'recipe',
+    description: '',
+    content: ''
+  });
+
+  const handleCreateStandard = () => {
+    if (newStandard.name && newStandard.type) {
+      console.log('Nouveau standard créé:', newStandard);
+      showModal('Standard Créé avec Succès', 
+        `✅ NOUVEAU STANDARD AJOUTÉ\n\n` +
+        `📋 Détails du standard:\n` +
+        `   • Nom: ${newStandard.name}\n` +
+        `   • Type: ${newStandard.type === 'recipe' ? 'Recette standardisée' : 
+                     newStandard.type === 'procedure' ? 'Procédure' :
+                     newStandard.type === 'checklist' ? 'Check-list' : 'Formation'}\n` +
+        `   • Description: ${newStandard.description || 'Aucune description'}\n\n` +
+        `🎯 Déploiement:\n` +
+        `   • Statut: En attente de validation\n` +
+        `   • Sites concernés: Tous (${Math.floor(Math.random() * 3) + 3} sites)\n` +
+        `   • Formation requise: ${newStandard.type === 'training' ? 'Oui' : 'Non'}\n\n` +
+        `📅 Planning de déploiement:\n` +
+        `   • Validation: ${new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n` +
+        `   • Formation équipes: ${new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n` +
+        `   • Mise en application: ${new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')}\n\n` +
+        `Le standard sera visible dans la liste après validation.`, 'success');
+      
+      setShowStandardModal(false);
+      setNewStandard({ name: '', type: 'recipe', description: '', content: '' });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium text-gray-900">Standards et Templates</h3>
+        <button 
+          className="btn btn-primary"
+          onClick={() => setShowStandardModal(true)}
+        >
+          Nouveau standard
+        </button>
+      </div>
+
+      {/* Modal de création de standard */}
+      {showStandardModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setShowStandardModal(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Créer un nouveau standard</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Nom du standard *</label>
+                    <input
+                      type="text"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newStandard.name}
+                      onChange={(e) => setNewStandard({...newStandard, name: e.target.value})}
+                      placeholder="Ex: Procédure d'ouverture"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Type *</label>
+                    <select
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newStandard.type}
+                      onChange={(e) => setNewStandard({...newStandard, type: e.target.value})}
+                    >
+                      <option value="recipe">Recette standardisée</option>
+                      <option value="procedure">Procédure</option>
+                      <option value="checklist">Check-list</option>
+                      <option value="training">Formation</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea
+                      rows={3}
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newStandard.description}
+                      onChange={(e) => setNewStandard({...newStandard, description: e.target.value})}
+                      placeholder="Description du standard..."
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={handleCreateStandard}
+                  disabled={!newStandard.name || !newStandard.type}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Créer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowStandardModal(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="card">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Recettes standardisées</h4>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <span className="font-medium">Burger Classic</span>
+                <div className="text-sm text-green-600">Déployé sur 12 sites</div>
+              </div>
+              <div className="flex space-x-2">
+                <button 
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => showModal('Modifier Burger Classic', 
+                    `✏️ MODIFICATION RECETTE STANDARD\n\n` +
+                    `🍔 Recette: Burger Classic\n` +
+                    `📊 Statut: Déployé sur 12 sites\n` +
+                    `⭐ Score qualité: 94%\n\n` +
+                    `📋 Ingrédients standardisés:\n` +
+                    `   • Pain burger: 1 unité (80g)\n` +
+                    `   • Steak haché: 1 pièce (120g)\n` +
+                    `   • Fromage cheddar: 1 tranche (20g)\n` +
+                    `   • Salade iceberg: 15g\n` +
+                    `   • Tomate: 2 tranches (30g)\n` +
+                    `   • Sauce burger: 15ml\n\n` +
+                    `🔧 Modifications possibles:\n` +
+                    `   • Ajuster les quantités\n` +
+                    `   • Modifier les ingrédients\n` +
+                    `   • Changer la présentation\n` +
+                    `   • Mettre à jour les instructions\n\n` +
+                    `⚠️ Impact du changement:\n` +
+                    `   • Formation requise: 12 sites\n` +
+                    `   • Coût formation: ~2,400€\n` +
+                    `   • Délai déploiement: 2 semaines`, 'warning')}
+                >
+                  Modifier
+                </button>
+                <button 
+                  className="text-green-600 hover:text-green-800 text-sm"
+                  onClick={() => showModal('Détails Burger Classic', 
+                    `🍔 FICHE TECHNIQUE - BURGER CLASSIC\n\n` +
+                    `📊 Informations générales:\n` +
+                    `   • Nom: Burger Classic\n` +
+                    `   • Catégorie: Plat principal\n` +
+                    `   • Temps préparation: 8 minutes\n` +
+                    `   • Difficulté: Facile\n` +
+                    `   • Prix de revient: 3.85€\n` +
+                    `   • Prix de vente: 12.90€\n` +
+                    `   • Marge: 70%\n\n` +
+                    `📋 Ingrédients (pour 1 portion):\n` +
+                    `   • Pain burger artisanal: 80g\n` +
+                    `   • Steak haché 15% MG: 120g\n` +
+                    `   • Fromage cheddar: 20g\n` +
+                    `   • Salade iceberg: 15g\n` +
+                    `   • Tomate fraîche: 30g\n` +
+                    `   • Sauce burger maison: 15ml\n\n` +
+                    `👨‍🍳 Instructions:\n` +
+                    `   1. Griller le pain (2min)\n` +
+                    `   2. Cuire le steak (4min)\n` +
+                    `   3. Assembler dans l'ordre\n` +
+                    `   4. Servir avec frites\n\n` +
+                    `📈 Performance:\n` +
+                    `   • Ventes/jour: 45 unités (moyenne)\n` +
+                    `   • Satisfaction: 4.6/5\n` +
+                    `   • Conformité: 98%`, 'info')}
+                >
+                  Détails
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <span className="font-medium">Pizza Margherita</span>
+                <div className="text-sm text-green-600">Déployé sur 8 sites</div>
+              </div>
+              <div className="flex space-x-2">
+                <button 
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => showModal('Modifier Pizza Margherita', 
+                    `✏️ MODIFICATION RECETTE STANDARD\n\n` +
+                    `🍕 Recette: Pizza Margherita\n` +
+                    `📊 Statut: Déployé sur 8 sites\n` +
+                    `⭐ Score qualité: 91%\n\n` +
+                    `📋 Ingrédients standardisés:\n` +
+                    `   • Pâte à pizza: 250g\n` +
+                    `   • Sauce tomate: 80ml\n` +
+                    `   • Mozzarella: 120g\n` +
+                    `   • Basilic frais: 5 feuilles\n` +
+                    `   • Huile d'olive: 10ml\n\n` +
+                    `🔧 Modifications possibles:\n` +
+                    `   • Ajuster l'épaisseur pâte\n` +
+                    `   • Modifier la sauce\n` +
+                    `   • Changer le fromage\n` +
+                    `   • Temps de cuisson\n\n` +
+                    `⚠️ Impact du changement:\n` +
+                    `   • Formation requise: 8 sites\n` +
+                    `   • Coût formation: ~1,600€\n` +
+                    `   • Délai déploiement: 10 jours`, 'warning')}
+                >
+                  Modifier
+                </button>
+                <button 
+                  className="text-green-600 hover:text-green-800 text-sm"
+                  onClick={() => showModal('Détails Pizza Margherita', 
+                    `🍕 FICHE TECHNIQUE - PIZZA MARGHERITA\n\n` +
+                    `📊 Informations générales:\n` +
+                    `   • Nom: Pizza Margherita\n` +
+                    `   • Catégorie: Pizza\n` +
+                    `   • Temps préparation: 12 minutes\n` +
+                    `   • Temps cuisson: 8 minutes\n` +
+                    `   • Difficulté: Moyenne\n` +
+                    `   • Prix de revient: 4.20€\n` +
+                    `   • Prix de vente: 14.50€\n` +
+                    `   • Marge: 71%\n\n` +
+                    `📋 Ingrédients (pour 1 pizza):\n` +
+                    `   • Pâte à pizza maison: 250g\n` +
+                    `   • Sauce tomate basilic: 80ml\n` +
+                    `   • Mozzarella di bufala: 120g\n` +
+                    `   • Basilic frais: 5 feuilles\n` +
+                    `   • Huile d'olive extra: 10ml\n\n` +
+                    `👨‍🍳 Instructions:\n` +
+                    `   1. Étaler la pâte (Ø 30cm)\n` +
+                    `   2. Napper de sauce\n` +
+                    `   3. Ajouter la mozzarella\n` +
+                    `   4. Cuire à 280°C (8min)\n` +
+                    `   5. Garnir de basilic\n\n` +
+                    `📈 Performance:\n` +
+                    `   • Ventes/jour: 32 unités (moyenne)\n` +
+                    `   • Satisfaction: 4.4/5\n` +
+                    `   • Conformité: 95%`, 'info')}
+                >
+                  Détails
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <span className="font-medium">Salade César</span>
+                <div className="text-sm text-yellow-600">En cours de déploiement</div>
+              </div>
+              <div className="flex space-x-2">
+                <button 
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => showModal('Modifier Salade César', 
+                    `✏️ MODIFICATION RECETTE STANDARD\n\n` +
+                    `🥗 Recette: Salade César\n` +
+                    `📊 Statut: En cours de déploiement (3/5 sites)\n` +
+                    `⭐ Score qualité: 89%\n\n` +
+                    `📋 Ingrédients standardisés:\n` +
+                    `   • Salade romaine: 150g\n` +
+                    `   • Poulet grillé: 100g\n` +
+                    `   • Parmesan: 30g\n` +
+                    `   • Croûtons: 25g\n` +
+                    `   • Sauce César: 40ml\n\n` +
+                    `🔧 Modifications possibles:\n` +
+                    `   • Ajuster les portions\n` +
+                    `   • Modifier la sauce\n` +
+                    `   • Changer le type de salade\n` +
+                    `   • Ajouter des ingrédients\n\n` +
+                    `⚠️ Impact du changement:\n` +
+                    `   • Sites en attente: 2\n` +
+                    `   • Formation supplémentaire requise\n` +
+                    `   • Délai déploiement: +1 semaine`, 'warning')}
+                >
+                  Modifier
+                </button>
+                <button 
+                  className="text-yellow-600 hover:text-yellow-800 text-sm"
+                  onClick={() => showModal('Détails Salade César', 
+                    `🥗 FICHE TECHNIQUE - SALADE CÉSAR\n\n` +
+                    `📊 Informations générales:\n` +
+                    `   • Nom: Salade César\n` +
+                    `   • Catégorie: Entrée/Plat léger\n` +
+                    `   • Temps préparation: 6 minutes\n` +
+                    `   • Difficulté: Facile\n` +
+                    `   • Prix de revient: 3.10€\n` +
+                    `   • Prix de vente: 11.90€\n` +
+                    `   • Marge: 74%\n\n` +
+                    `📋 Ingrédients (pour 1 portion):\n` +
+                    `   • Salade romaine: 150g\n` +
+                    `   • Blanc de poulet grillé: 100g\n` +
+                    `   • Parmesan râpé: 30g\n` +
+                    `   • Croûtons maison: 25g\n` +
+                    `   • Sauce César: 40ml\n\n` +
+                    `👨‍🍳 Instructions:\n` +
+                    `   1. Laver et couper la salade\n` +
+                    `   2. Griller le poulet (5min)\n` +
+                    `   3. Préparer les croûtons\n` +
+                    `   4. Assembler et assaisonner\n\n` +
+                    `📈 Déploiement:\n` +
+                    `   • Sites actifs: 3/5\n` +
+                    `   • Formation en cours: 2 sites\n` +
+                    `   • Lancement prévu: 15 janvier`, 'warning')}
+                >
+                  Détails
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Procédures</h4>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <span className="font-medium">Ouverture quotidienne</span>
+                <div className="text-sm text-green-600">100% conformité</div>
+              </div>
+              <div className="flex space-x-2">
+                <button 
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => showModal('Modifier Procédure Ouverture', 
+                    `✏️ MODIFICATION PROCÉDURE\n\n` +
+                    `🏪 Procédure: Ouverture quotidienne\n` +
+                    `📊 Conformité actuelle: 100%\n` +
+                    `⭐ Performance: Excellente\n\n` +
+                    `📋 Étapes actuelles:\n` +
+                    `   1. Désactivation alarme (7h00)\n` +
+                    `   2. Vérification température frigos\n` +
+                    `   3. Contrôle propreté surfaces\n` +
+                    `   4. Mise en route équipements\n` +
+                    `   5. Préparation caisse\n` +
+                    `   6. Briefing équipe (7h30)\n` +
+                    `   7. Ouverture au public (8h00)\n\n` +
+                    `🔧 Modifications possibles:\n` +
+                    `   • Ajuster les horaires\n` +
+                    `   • Ajouter des contrôles\n` +
+                    `   • Modifier l'ordre des tâches\n` +
+                    `   • Changer les responsabilités\n\n` +
+                    `✅ Recommandation:\n` +
+                    `Cette procédure fonctionne parfaitement. Évitez les modifications non nécessaires.`, 'success')}
+                >
+                  Modifier
+                </button>
+                <button 
+                  className="text-green-600 hover:text-green-800 text-sm"
+                  onClick={() => showModal('Détails Procédure Ouverture', 
+                    `🏪 PROCÉDURE - OUVERTURE QUOTIDIENNE\n\n` +
+                    `📊 Informations générales:\n` +
+                    `   • Nom: Ouverture quotidienne\n` +
+                    `   • Type: Procédure opérationnelle\n` +
+                    `   • Fréquence: Quotidienne\n` +
+                    `   • Durée: 60 minutes\n` +
+                    `   • Responsable: Manager/Chef d'équipe\n\n` +
+                    `📋 Check-list détaillée:\n` +
+                    `   ✅ 7h00 - Désactivation alarme\n` +
+                    `   ✅ 7h05 - Contrôle température (-2°C à +4°C)\n` +
+                    `   ✅ 7h10 - Vérification propreté (surfaces, sols)\n` +
+                    `   ✅ 7h15 - Mise en route équipements\n` +
+                    `   ✅ 7h20 - Préparation caisse (fond de caisse)\n` +
+                    `   ✅ 7h25 - Vérification stocks urgents\n` +
+                    `   ✅ 7h30 - Briefing équipe (objectifs, promos)\n` +
+                    `   ✅ 7h55 - Contrôle final\n` +
+                    `   ✅ 8h00 - Ouverture au public\n\n` +
+                    `📈 Performance par site:\n` +
+                    `   • Paris: 100% (Excellent)\n` +
+                    `   • Lyon: 100% (Excellent)\n` +
+                    `   • Toulouse: 100% (Excellent)\n` +
+                    `   • Nice: 100% (Excellent)\n` +
+                    `   • Marseille: 100% (Excellent)\n\n` +
+                    `🎯 Cette procédure est un modèle de réussite !`, 'success')}
+                >
+                  Détails
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <span className="font-medium">Nettoyage cuisine</span>
+                <div className="text-sm text-green-600">95% conformité</div>
+              </div>
+              <div className="flex space-x-2">
+                <button 
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => showModal('Modifier Procédure Nettoyage', 
+                    `✏️ MODIFICATION PROCÉDURE\n\n` +
+                    `🧽 Procédure: Nettoyage cuisine\n` +
+                    `📊 Conformité actuelle: 95%\n` +
+                    `⚠️ Site en difficulté: Nice (88%)\n\n` +
+                    `📋 Étapes actuelles:\n` +
+                    `   1. Nettoyage surfaces (après chaque service)\n` +
+                    `   2. Désinfection plans de travail\n` +
+                    `   3. Nettoyage équipements\n` +
+                    `   4. Lavage sols et murs\n` +
+                    `   5. Contrôle température frigos\n` +
+                    `   6. Évacuation déchets\n\n` +
+                    `🔧 Améliorations suggérées:\n` +
+                    `   • Renforcer formation Nice\n` +
+                    `   • Ajouter contrôle intermédiaire\n` +
+                    `   • Clarifier responsabilités\n` +
+                    `   • Mettre à jour produits\n\n` +
+                    `🎯 Objectif: Atteindre 98% de conformité`, 'warning')}
+                >
+                  Modifier
+                </button>
+                <button 
+                  className="text-green-600 hover:text-green-800 text-sm"
+                  onClick={() => showModal('Détails Procédure Nettoyage', 
+                    `🧽 PROCÉDURE - NETTOYAGE CUISINE\n\n` +
+                    `📊 Informations générales:\n` +
+                    `   • Nom: Nettoyage cuisine\n` +
+                    `   • Type: Procédure hygiène\n` +
+                    `   • Fréquence: Continue + quotidienne\n` +
+                    `   • Durée: 45 minutes (fin de service)\n` +
+                    `   • Responsable: Chef de cuisine\n\n` +
+                    `📋 Protocole détaillé:\n` +
+                    `   🧽 Nettoyage immédiat (après chaque plat)\n` +
+                    `   🧴 Désinfection surfaces (toutes les 2h)\n` +
+                    `   🔧 Nettoyage équipements (fin service)\n` +
+                    `   🧹 Lavage sols et murs (fermeture)\n` +
+                    `   🌡️ Contrôle températures (3x/jour)\n` +
+                    `   🗑️ Évacuation déchets (fermeture)\n\n` +
+                    `📈 Performance par site:\n` +
+                    `   • Paris: 98% (Excellent)\n` +
+                    `   • Lyon: 96% (Très bon)\n` +
+                    `   • Toulouse: 94% (Bon)\n` +
+                    `   • Marseille: 92% (Correct)\n` +
+                    `   • Nice: 88% (À améliorer)\n\n` +
+                    `⚠️ Action requise: Formation Nice programmée`, 'info')}
+                >
+                  Détails
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded hover:bg-gray-100 transition-colors">
+              <div className="flex-1">
+                <span className="font-medium">Fermeture caisse</span>
+                <div className="text-sm text-red-600">85% conformité</div>
+              </div>
+              <div className="flex space-x-2">
+                <button 
+                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  onClick={() => showModal('Modifier Procédure Fermeture Caisse', 
+                    `✏️ MODIFICATION PROCÉDURE URGENTE\n\n` +
+                    `💰 Procédure: Fermeture caisse\n` +
+                    `📊 Conformité actuelle: 85%\n` +
+                    `❌ Sites en difficulté: Marseille (75%), Nice (80%)\n\n` +
+                    `📋 Problèmes identifiés:\n` +
+                    `   • Comptage incomplet\n` +
+                    `   • Rapprochement bancaire manqué\n` +
+                    `   • Documentation insuffisante\n` +
+                    `   • Retards de transmission\n\n` +
+                    `🔧 Modifications urgentes:\n` +
+                    `   • Double contrôle obligatoire\n` +
+                    `   • Check-list détaillée\n` +
+                    `   • Formation renforcée\n` +
+                    `   • Supervision manager\n\n` +
+                    `⚠️ PRIORITÉ HAUTE\n` +
+                    `Cette procédure impacte la sécurité financière. Modification immédiate recommandée.`, 'error')}
+                >
+                  Modifier
+                </button>
+                <button 
+                  className="text-red-600 hover:text-red-800 text-sm"
+                  onClick={() => showModal('Détails Procédure Fermeture Caisse', 
+                    `💰 PROCÉDURE - FERMETURE CAISSE\n\n` +
+                    `📊 Informations générales:\n` +
+                    `   • Nom: Fermeture caisse\n` +
+                    `   • Type: Procédure financière\n` +
+                    `   • Fréquence: Quotidienne\n` +
+                    `   • Durée: 30 minutes\n` +
+                    `   • Responsable: Manager + Caissier\n\n` +
+                    `📋 Étapes actuelles:\n` +
+                    `   💵 Comptage espèces\n` +
+                    `   💳 Vérification CB/chèques\n` +
+                    `   📊 Édition rapport Z\n` +
+                    `   📝 Rapprochement bancaire\n` +
+                    `   📁 Archivage documents\n` +
+                    `   📧 Transmission siège\n\n` +
+                    `❌ Performance par site:\n` +
+                    `   • Paris: 95% (Bon)\n` +
+                    `   • Lyon: 90% (Correct)\n` +
+                    `   • Toulouse: 88% (Limite)\n` +
+                    `   • Nice: 80% (Insuffisant)\n` +
+                    `   • Marseille: 75% (Critique)\n\n` +
+                    `🚨 ACTIONS IMMÉDIATES:\n` +
+                    `   • Audit surprise Marseille\n` +
+                    `   • Formation d'urgence Nice\n` +
+                    `   • Supervision renforcée`, 'error')}
+                >
+                  Détails
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AuditsManagement = ({ showModal }) => {
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [newAudit, setNewAudit] = useState({
+    site: '',
+    date: '',
+    time: '',
+    auditor: '',
+    type: 'quality'
+  });
+
+  const handleScheduleAudit = () => {
+    if (newAudit.site && newAudit.date && newAudit.time) {
+      console.log('Nouvel audit programmé:', newAudit);
+      showModal('Audit Programmé avec Succès', 
+        `✅ NOUVEL AUDIT PLANIFIÉ\n\n` +
+        `🔍 Détails de l'audit:\n` +
+        `   • Site: ${newAudit.site === 'paris-centre' ? 'Paris Centre' :
+                     newAudit.site === 'lyon-partdieu' ? 'Lyon Part-Dieu' :
+                     newAudit.site === 'marseille-vieux-port' ? 'Marseille Vieux-Port' :
+                     newAudit.site === 'toulouse-capitole' ? 'Toulouse Capitole' : newAudit.site}\n` +
+        `   • Date: ${new Date(newAudit.date).toLocaleDateString('fr-FR')}\n` +
+        `   • Heure: ${newAudit.time}\n` +
+        `   • Type: ${newAudit.type === 'quality' ? 'Contrôle qualité' :
+                      newAudit.type === 'hygiene' ? 'Audit hygiène' :
+                      newAudit.type === 'service' ? 'Évaluation service' : 'Conformité standards'}\n` +
+        `   • Auditeur: ${newAudit.auditor || 'À assigner'}\n\n` +
+        `📋 Préparation automatique:\n` +
+        `   • Check-list générée\n` +
+        `   • Notification envoyée au site\n` +
+        `   • Rappel programmé (J-1)\n` +
+        `   • Rapport template préparé\n\n` +
+        `📅 Planning mis à jour:\n` +
+        `L'audit apparaît maintenant dans la liste des audits programmés.\n\n` +
+        `📧 Notifications envoyées:\n` +
+        `   • Manager du site\n` +
+        `   • Équipe d'audit\n` +
+        `   • Direction régionale`, 'success');
+      
+      setShowAuditModal(false);
+      setNewAudit({ site: '', date: '', time: '', auditor: '', type: 'quality' });
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-medium text-gray-900">Audits et Contrôles</h3>
+        <button 
+          className="btn btn-primary"
+          onClick={() => setShowAuditModal(true)}
+        >
+          Programmer audit
+        </button>
+      </div>
+
+      {/* Modal de programmation d'audit */}
+      {showAuditModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div className="fixed inset-0 transition-opacity" onClick={() => setShowAuditModal(false)}>
+              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Programmer un audit</h3>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Site à auditer *</label>
+                    <select
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newAudit.site}
+                      onChange={(e) => setNewAudit({...newAudit, site: e.target.value})}
+                    >
+                      <option value="">Sélectionner un site</option>
+                      <option value="paris-centre">Paris Centre</option>
+                      <option value="lyon-partdieu">Lyon Part-Dieu</option>
+                      <option value="marseille-vieux-port">Marseille Vieux-Port</option>
+                      <option value="toulouse-capitole">Toulouse Capitole</option>
+                    </select>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Date *</label>
+                      <input
+                        type="date"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newAudit.date}
+                        onChange={(e) => setNewAudit({...newAudit, date: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Heure *</label>
+                      <input
+                        type="time"
+                        className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newAudit.time}
+                        onChange={(e) => setNewAudit({...newAudit, time: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Type d'audit *</label>
+                    <select
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newAudit.type}
+                      onChange={(e) => setNewAudit({...newAudit, type: e.target.value})}
+                    >
+                      <option value="quality">Contrôle qualité</option>
+                      <option value="hygiene">Audit hygiène</option>
+                      <option value="service">Évaluation service</option>
+                      <option value="compliance">Conformité standards</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Auditeur</label>
+                    <input
+                      type="text"
+                      className="mt-1 block w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newAudit.auditor}
+                      onChange={(e) => setNewAudit({...newAudit, auditor: e.target.value})}
+                      placeholder="Nom de l'auditeur"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button
+                  type="button"
+                  onClick={handleScheduleAudit}
+                  disabled={!newAudit.site || !newAudit.date || !newAudit.time}
+                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Programmer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAuditModal(false)}
+                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                >
+                  Annuler
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="card">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Audits programmés</h4>
+          <div className="space-y-3">
+            <div className="p-3 border-l-4 border-blue-500 bg-blue-50">
+              <p className="font-medium">Site Paris Centre</p>
+              <p className="text-sm text-gray-600">Demain 14h00</p>
+            </div>
+            <div className="p-3 border-l-4 border-blue-500 bg-blue-50">
+              <p className="font-medium">Site Lyon Part-Dieu</p>
+              <p className="text-sm text-gray-600">Vendredi 10h00</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Résultats récents</h4>
+          <div className="space-y-3">
+            <div className="p-3 border-l-4 border-green-500 bg-green-50">
+              <p className="font-medium">Site Marseille</p>
+              <p className="text-sm text-gray-600">Score: 92% - Excellent</p>
+            </div>
+            <div className="p-3 border-l-4 border-yellow-500 bg-yellow-50">
+              <p className="font-medium">Site Toulouse</p>
+              <p className="text-sm text-gray-600">Score: 78% - À améliorer</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="card">
+          <h4 className="text-lg font-medium text-gray-900 mb-4">Actions requises</h4>
+          <div className="space-y-3">
+            <div className="p-3 border-l-4 border-red-500 bg-red-50">
+              <p className="font-medium">Formation équipe</p>
+              <p className="text-sm text-gray-600">Site Bordeaux</p>
+            </div>
+            <div className="p-3 border-l-4 border-orange-500 bg-orange-50">
+              <p className="font-medium">Mise à jour procédures</p>
+              <p className="text-sm text-gray-600">3 sites concernés</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+
+export default ChainManagement;
