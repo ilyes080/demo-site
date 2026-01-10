@@ -1,0 +1,258 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "settings": "Settings",
+    "logout": "Logout",
+    "profile": "Profile",
+    "help": "Help",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "yes": "Yes",
+    "no": "No",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "auth": {
+    "login": "Login",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "welcome": "Welcome",
+    "invalidCredentials": "Invalid credentials",
+    "loginSuccess": "Login successful",
+    "demoAccounts": "Demo Accounts",
+    "chainAccount": "Chain Account",
+    "gastroAccount": "Gastronomic Account"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "recipes": "Recipes",
+    "inventory": "Inventory",
+    "orders": "Orders",
+    "restaurants": "Restaurants",
+    "chains": "Chain Management",
+    "gastronomy": "Gastronomy Tools",
+    "enterprise": "Enterprise",
+    "aiCopilot": "AI Copilot",
+    "reports": "Reports",
+    "analytics": "Analytics"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Overview of your business activity",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "kpis": {
+      "dailyRevenue": "Daily Revenue",
+      "ordersToday": "Orders Today",
+      "averageTicket": "Average Ticket",
+      "satisfaction": "Customer Satisfaction"
+    },
+    "actions": {
+      "newRecipe": "New Recipe",
+      "newOrder": "New Order",
+      "inventoryCheck": "Check Inventory",
+      "dailyReport": "Daily Report"
+    }
+  },
+  "recipes": {
+    "title": "Recipe Management",
+    "subtitle": "Create and manage your recipes",
+    "newRecipe": "New Recipe",
+    "recipeName": "Recipe name",
+    "category": "Category",
+    "preparationTime": "Preparation time",
+    "cookingTime": "Cooking time",
+    "servings": "Servings",
+    "difficulty": "Difficulty",
+    "ingredients": "Ingredients",
+    "instructions": "Instructions",
+    "cost": "Cost",
+    "price": "Selling price",
+    "margin": "Margin",
+    "addIngredient": "Add ingredient",
+    "ingredient": "Ingredient",
+    "quantity": "Quantity",
+    "unit": "Unit",
+    "notes": "Notes",
+    "categories": {
+      "appetizer": "Appetizer",
+      "main": "Main course",
+      "dessert": "Dessert",
+      "drink": "Drink",
+      "sauce": "Sauce",
+      "side": "Side dish"
+    },
+    "difficulties": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "units": {
+      "kg": "Kilogram",
+      "g": "Gram",
+      "l": "Liter",
+      "ml": "Milliliter",
+      "cl": "Centiliter",
+      "piece": "Piece",
+      "cup": "Cup",
+      "tbsp": "Tablespoon",
+      "tsp": "Teaspoon"
+    }
+  },
+  "inventory": {
+    "title": "Inventory Management",
+    "subtitle": "Track your stock in real-time",
+    "addProduct": "Add product",
+    "productName": "Product name",
+    "currentStock": "Current stock",
+    "minStock": "Minimum stock",
+    "maxStock": "Maximum stock",
+    "unitPrice": "Unit price",
+    "supplier": "Supplier",
+    "expiryDate": "Expiry date",
+    "location": "Location",
+    "status": "Status",
+    "actions": "Actions",
+    "lowStock": "Low stock",
+    "outOfStock": "Out of stock",
+    "inStock": "In stock",
+    "expired": "Expired",
+    "nearExpiry": "Near expiry"
+  },
+  "orders": {
+    "title": "Order Management",
+    "subtitle": "Track and manage your orders",
+    "newOrder": "New Order",
+    "orderNumber": "Order number",
+    "customer": "Customer",
+    "date": "Date",
+    "time": "Time",
+    "status": "Status",
+    "total": "Total",
+    "items": "Items",
+    "addItem": "Add item",
+    "recipe": "Recipe",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "subtotal": "Subtotal",
+    "statuses": {
+      "pending": "Pending",
+      "preparing": "Preparing",
+      "ready": "Ready",
+      "served": "Served",
+      "cancelled": "Cancelled"
+    }
+  },
+  "chains": {
+    "title": "Chain Management",
+    "subtitle": "Multi-site management and standardization",
+    "overview": "Overview",
+    "sites": "Site Management",
+    "standards": "Standards",
+    "audits": "Audits",
+    "kpis": {
+      "totalSites": "Total Sites",
+      "totalRevenue": "Total Revenue",
+      "averageScore": "Average Score",
+      "compliance": "Compliance"
+    },
+    "sitePerformance": "Site performance",
+    "site": "Site",
+    "dailyRevenue": "Daily Revenue",
+    "score": "Score",
+    "status": "Status",
+    "actions": "Actions",
+    "viewDetails": "View details",
+    "statuses": {
+      "excellent": "Excellent",
+      "good": "Good",
+      "needsImprovement": "Needs improvement"
+    }
+  },
+  "gastronomy": {
+    "title": "Gastronomy Tools",
+    "subtitle": "Specialized tools for fine dining",
+    "preciseCosting": "Precise Costing",
+    "traceability": "Product Traceability",
+    "seasonalMenus": "Seasonal Menus",
+    "qualityControl": "Quality Control",
+    "allergenManagement": "Allergen Management",
+    "nutritionalAnalysis": "Nutritional Analysis"
+  },
+  "enterprise": {
+    "title": "Enterprise Solutions",
+    "subtitle": "Advanced tools for large organizations",
+    "businessIntelligence": "Business Analysis",
+    "predictiveAnalytics": "Predictive Analytics",
+    "roiCalculator": "ROI Calculator",
+    "features": {
+      "multiSite": "Multi-Site Management",
+      "advancedReporting": "Advanced Reporting",
+      "apiIntegration": "API Integration",
+      "customDashboards": "Custom Dashboards"
+    }
+  },
+  "ai": {
+    "title": "AI Copilot",
+    "subtitle": "Artificial intelligence to optimize your restaurant",
+    "dishSuggestions": "Dish Suggestions",
+    "profitabilityAnalysis": "Profitability Analysis",
+    "benchmarkAnalysis": "Benchmark Analysis",
+    "intelligentAlerts": "Intelligent Alerts",
+    "optimization": "Optimization",
+    "predictions": "Predictions",
+    "recommendations": "Recommendations"
+  },
+  "settings": {
+    "title": "Settings",
+    "general": "General",
+    "language": "Language",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "dataManagement": "Data Management",
+    "resetData": "Reset Data",
+    "resetDataConfirm": "Are you sure you want to reset all data? This action is irreversible.",
+    "resetDataSuccess": "Data reset successfully",
+    "languages": {
+      "fr": "Français",
+      "en": "English"
+    },
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "auto": "Auto"
+    }
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "networkError": "Network error",
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access forbidden",
+    "serverError": "Server error",
+    "validationError": "Validation error"
+  },
+  "success": {
+    "saved": "Saved successfully",
+    "deleted": "Deleted successfully",
+    "updated": "Updated successfully",
+    "created": "Created successfully"
+  }
+}
