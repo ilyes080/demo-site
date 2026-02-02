@@ -1,36 +1,36 @@
 # RestaurantPro - Solution SaaS Complète pour Restaurants
 
-## 🎯 Présentation
+##  Présentation
 
 RestaurantPro est une solution SaaS professionnelle spécialement conçue pour les restaurants modernes. Avec des modules spécialisés pour les chaînes de restaurants et les établissements gastronomiques, elle offre une gestion complète et intelligente de votre activité.
 
-## ✨ Fonctionnalités Principales
+##  Fonctionnalités Principales
 
-### 🤖 Intelligence Artificielle Intégrée
+###  Intelligence Artificielle Intégrée
 - **Copilote IA de Rentabilité** : Analyse automatique des marges et recommandations d'optimisation
 - **Alertes Intelligentes** : Détection proactive des problèmes de rentabilité
 - **Benchmark Anonyme** : Comparaison avec des restaurants similaires
 - **Suggestions de Plats** : Recommandations basées sur les tendances du marché
 
-### 🏢 Module Chaînes de Restaurants
+###  Module Chaînes de Restaurants
 - **Gestion Multi-Sites** : Supervision centralisée de tous vos établissements
 - **Audits et Conformité** : Suivi automatisé des standards et procédures
 - **Analyses Comparatives** : Performance détaillée entre sites
 - **Optimisation des Achats** : Gestion centralisée des stocks et fournisseurs
 
-### ⭐ Module Gastronomique
+###  Module Gastronomique
 - **Calcul de Coûts Précis** : Analyse au gramme près pour chaque recette
 - **Traçabilité Complète** : Suivi détaillé des lots et certifications
 - **Gestion Saisonnière** : Adaptation automatique aux produits de saison
 - **Optimisation des Marges** : Recommandations personnalisées pour maximiser la rentabilité
 
-### 📊 Tableau de Bord Intelligent
+###  Tableau de Bord Intelligent
 - **Données Temps Réel** : Métriques calculées à partir de vos vraies recettes
 - **Interface Moderne** : Design professionnel avec animations fluides
 - **Analyses Prédictives** : Projections et tendances basées sur vos données
 - **Recommandations Personnalisées** : Conseils adaptés à votre type d'établissement
 
-## 🚀 Installation et Démarrage
+##  Installation et Démarrage
 
 ### Mode Démonstration (Recommandé)
 Le mode démo permet de tester immédiatement toutes les fonctionnalités :
@@ -64,7 +64,7 @@ npm run init:db
 npm run dev
 ```
 
-## 💼 Configuration Production
+##  Configuration Production
 
 ### Déploiement Automatisé
 ```bash
@@ -88,7 +88,7 @@ DB_USER=your-username
 DB_PASS=your-password
 ```
 
-## 🎨 Interface Utilisateur
+##  Interface Utilisateur
 
 ### Design Moderne 2024
 - **Gradients Sophistiqués** : Interface élégante avec dégradés professionnels
@@ -102,7 +102,7 @@ DB_PASS=your-password
 - **Feedback Visuel** : Confirmations et états de chargement
 - **Personnalisation** : Adaptation selon le type de restaurant
 
-## 📈 Avantages Concurrentiels
+##  Avantages Concurrentiels
 
 ### Données Réelles
 - **Calculs Précis** : Basés sur vos vraies recettes et ingrédients
@@ -119,7 +119,7 @@ DB_PASS=your-password
 - **Modules Spécialisés** : Fonctionnalités adaptées à votre type d'établissement
 - **Évolution Continue** : Mises à jour régulières avec nouvelles fonctionnalités
 
-## 🔧 Architecture Technique
+##  Architecture Technique
 
 ### Backend Robuste
 - **Express.js** : Framework web éprouvé
@@ -133,7 +133,7 @@ DB_PASS=your-password
 - **React Query** : Gestion optimisée des données
 - **Composants Réutilisables** : Architecture modulaire
 
-## 📞 Support et Documentation
+##  Support et Documentation
 
 ### Accès
 - **Application** : http://localhost:3000
@@ -146,10 +146,11 @@ DB_PASS=your-password
 - Configuration de production simplifiée
 - Support pour déploiement sur tous environnements
 
-## 📄 Licence et Utilisation
+##  Licence et Utilisation
 
 RestaurantPro est une solution professionnelle complète, prête pour un usage commercial immédiat. Tous les composants sont optimisés pour la performance et la sécurité en environnement de production.
 
 ---
 
-**RestaurantPro - La solution intelligente pour restaurants modernes** 🚀
+
+**RestaurantPro - La solution intelligente pour restaurants modernes** 
